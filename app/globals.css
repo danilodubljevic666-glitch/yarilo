@@ -1,26 +1,213 @@
 @import "tailwindcss";
 
+@theme {
+  --color-mil-dark: #0a0a0a;
+  --color-mil-card: #121212;
+  --color-mil-surface: #1a1a1a;
+  --color-mil-border: #2a2a2a;
+  --color-mil-green: #2d5016;
+  --color-mil-green-mid: #3d6b22;
+  --color-mil-green-light: #5a9e35;
+  --color-mil-green-glow: rgba(61, 107, 34, 0.15);
+  --color-mil-gold: #c8a96e;
+  --color-mil-gold-light: #dfc18a;
+  --color-mil-text: #e8e0d0;
+  --color-mil-muted: #7a7060;
+  --font-display: "Rajdhani", "Oswald", system-ui, sans-serif;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --background: #0a0a0a;
+  --foreground: #e8e0d0;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+/* ─── Military grid overlay ─── */
+.military-grid {
+  background-image:
+    linear-gradient(rgba(61, 107, 34, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(61, 107, 34, 0.05) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+/* ─── Section heading accent ─── */
+.section-title {
+  font-family: var(--font-display);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+/* ─── Clip-path corners ─── */
+.clip-corner {
+  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%);
+}
+.clip-corner-sm {
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
+}
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #0a0a0a; }
+::-webkit-scrollbar-thumb { background: #3d6b22; border-radius: 3px; }
+
+/* ══════════════════════════════════════════════
+   CSS KEYFRAME ANIMATIONS
+   (used for above-the-fold / hero content)
+══════════════════════════════════════════════ */
+
+@keyframes hero-line-in {
+  from { opacity: 0; width: 0; }
+  to   { opacity: 0.6; width: 5rem; }
+}
+@keyframes hero-badge-in {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes hero-title-in {
+  from { opacity: 0; transform: scale(0.93) translateY(24px); letter-spacing: 0.35em; }
+  to   { opacity: 1; transform: scale(1) translateY(0); letter-spacing: 0.15em; }
+}
+@keyframes hero-sub-in {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes hero-btn-in {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes hero-scroll-in {
+  from { opacity: 0; }
+  to   { opacity: 0.4; }
+}
+@keyframes scroll-line-drop {
+  0%   { height: 0; opacity: 0.6; }
+  100% { height: 2.5rem; opacity: 0; }
+}
+@keyframes corner-draw {
+  from { opacity: 0; width: 0; height: 0; }
+  to   { opacity: 0.4; width: 4rem; height: 4rem; }
+}
+@keyframes grid-breathe {
+  0%, 100% { opacity: 0.55; }
+  50%       { opacity: 0.75; }
+}
+@keyframes scanline {
+  0%   { transform: translateY(-100%); opacity: 0.04; }
+  100% { transform: translateY(100vh); opacity: 0.04; }
+}
+@keyframes pulse-dot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%       { transform: scale(1.6); opacity: 0.5; }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-8px); }
+}
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(90, 158, 53, 0); }
+  50%       { box-shadow: 0 0 20px 4px rgba(90, 158, 53, 0.18); }
+}
+@keyframes line-expand {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+@keyframes number-count-in {
+  from { opacity: 0; transform: translateY(20px) scale(0.8); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ─── Hero element classes ─── */
+.hero-line-left {
+  animation: hero-line-in 0.8s ease-out 0.2s both;
+  @apply h-px bg-mil-gold;
+}
+.hero-line-right {
+  animation: hero-line-in 0.8s ease-out 0.2s both;
+  @apply h-px bg-mil-gold;
+}
+.hero-badge {
+  animation: hero-badge-in 0.6s ease-out 0.5s both;
+}
+.hero-title {
+  animation: hero-title-in 1s cubic-bezier(0.22, 1, 0.36, 1) 0.35s both;
+}
+.hero-subtitle {
+  animation: hero-sub-in 0.7s ease-out 0.85s both;
+}
+.hero-desc {
+  animation: hero-sub-in 0.7s ease-out 1.05s both;
+}
+.hero-cta {
+  animation: hero-btn-in 0.7s ease-out 1.25s both;
+}
+.hero-scroll {
+  animation: hero-scroll-in 1s ease-out 1.8s both;
+}
+.hero-scroll-line {
+  animation: scroll-line-drop 1.8s ease-in-out 2s infinite;
+}
+.hero-corner {
+  animation: corner-draw 0.8s ease-out 0.1s both;
+}
+.hero-grid {
+  animation: grid-breathe 6s ease-in-out infinite;
+}
+
+/* ─── Scanline effect (hero) ─── */
+.hero-scanline::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(90, 158, 53, 0.3), transparent);
+  animation: scanline 4s linear 2s infinite;
+  pointer-events: none;
+}
+
+/* ─── Pulse dot (shop "coming soon") ─── */
+.pulse-dot {
+  animation: pulse-dot 1.5s ease-in-out infinite;
+}
+
+/* ─── Float animation ─── */
+.float-anim {
+  animation: float 4s ease-in-out infinite;
+}
+
+/* ─── Glow on cards ─── */
+.glow-on-hover {
+  transition: box-shadow 0.3s ease;
+}
+.glow-on-hover:hover {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+/* ─── Stat number ─── */
+.stat-number {
+  animation: number-count-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ─── Image overlay shimmer ─── */
+@keyframes shimmer {
+  from { background-position: -200% 0; }
+  to   { background-position: 200% 0; }
+}
+.img-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(200, 169, 110, 0.06) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 3s linear infinite;
+  pointer-events: none;
 }
