@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Animate, Stagger, StaggerItem } from "@/components/Animate";
+import HeroAnimated from "@/components/HeroAnimated";
 
 const services = [
   { title: "Organizacija igara", desc: "Redovni skirmish mečevi i mil-sim operacije na terenima širom Crne Gore." },
@@ -77,66 +78,8 @@ export default function HomePage() {
         {/* Grid overlay */}
         <div className="absolute inset-0 military-grid hero-grid" />
 
-        {/* Corner accents */}
-        <div className="hero-corner absolute top-24 left-6 sm:left-10 w-16 h-16 border-l-2 border-t-2 border-mil-green-mid" />
-        <div className="hero-corner absolute top-24 right-6 sm:right-10 w-16 h-16 border-r-2 border-t-2 border-mil-green-mid" />
-        <div className="hero-corner absolute bottom-16 left-6 sm:left-10 w-16 h-16 border-l-2 border-b-2 border-mil-green-mid" />
-        <div className="hero-corner absolute bottom-16 right-6 sm:right-10 w-16 h-16 border-r-2 border-b-2 border-mil-green-mid" />
-
-        {/* Content */}
-        <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
-          <div className="flex items-center justify-center gap-3 mb-6">
-            <div className="hero-line-left w-12 sm:w-20" />
-            <span className="hero-badge text-mil-gold text-xs sm:text-sm tracking-[0.4em] uppercase"
-              style={{ fontFamily: "var(--font-rajdhani)" }}>
-              Crna Gora
-            </span>
-            <div className="hero-line-right w-12 sm:w-20" />
-          </div>
-
-          <h1
-            className="hero-title text-6xl sm:text-8xl md:text-[10rem] font-bold tracking-[0.15em] text-white leading-none mb-2"
-            style={{ fontFamily: "var(--font-rajdhani)" }}
-          >
-            YARILO
-          </h1>
-
-          <p className="hero-subtitle text-mil-green-light text-lg sm:text-2xl tracking-[0.3em] uppercase mb-8 font-medium"
-            style={{ fontFamily: "var(--font-rajdhani)" }}>
-            Airsoft Klub
-          </p>
-
-          <p className="hero-desc text-mil-text/60 text-sm sm:text-base max-w-xl mx-auto mb-10 leading-relaxed">
-            U polju u kojem je svaki udarac i svaki manevar nadmetanje za
-            superiornost, isticanje nije samo vještina — to je i strategija.
-          </p>
-
-          <div className="hero-cta flex flex-col sm:flex-row gap-4 justify-center">
-            <a
-              href="https://www.instagram.com/yarilo_airsoft/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-mil-green-mid hover:bg-mil-green-light text-white font-semibold tracking-[0.15em] uppercase clip-corner transition-all duration-200 hover:scale-105"
-              style={{ fontFamily: "var(--font-rajdhani)" }}
-            >
-              <span>Pridruži se timu</span>
-              <span className="text-mil-gold">→</span>
-            </a>
-            <Link
-              href="/events"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 border border-mil-border hover:border-mil-gold text-mil-text/70 hover:text-mil-gold font-semibold tracking-[0.15em] uppercase clip-corner transition-all duration-200 hover:scale-105"
-              style={{ fontFamily: "var(--font-rajdhani)" }}
-            >
-              Nadolazeći eventi
-            </Link>
-          </div>
-        </div>
-
-        {/* Scroll indicator */}
-        <div className="hero-scroll absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
-          <span className="text-[10px] tracking-[0.3em] uppercase text-mil-text">Scroll</span>
-          <div className="hero-scroll-line w-px bg-gradient-to-b from-mil-green-light to-transparent" />
-        </div>
+        {/* All animated hero content — controlled by PreloaderContext */}
+        <HeroAnimated />
       </section>
 
       {/* ════════════════════════════════════
