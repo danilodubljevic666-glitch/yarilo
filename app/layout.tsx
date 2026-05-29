@@ -3,6 +3,7 @@ import { Rajdhani } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import Preloader from "@/components/Preloader";
 
 const rajdhani = Rajdhani({
   weight: ["400", "500", "600", "700"],
@@ -36,6 +37,7 @@ export default function RootLayout({
   return (
     <html lang="sr" className={rajdhani.variable}>
       <body className="min-h-screen flex flex-col bg-mil-dark text-mil-text antialiased">
+        <Preloader />
         <Navbar />
         <main className="flex-1">{children}</main>
         <Footer />

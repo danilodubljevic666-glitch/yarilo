@@ -69,9 +69,9 @@ export default function HomePage() {
             className="object-cover object-center"
             quality={85}
           />
-          {/* Dark military overlay */}
-          <div className="absolute inset-0 bg-gradient-to-br from-mil-dark/95 via-mil-dark/85 to-[#050f03]/95" />
-          <div className="absolute inset-0 bg-gradient-to-t from-mil-dark via-transparent to-mil-dark/70" />
+          {/* Dark military overlay — reduced to let image breathe */}
+          <div className="absolute inset-0 bg-gradient-to-br from-mil-dark/80 via-mil-dark/50 to-[#050f03]/75" />
+          <div className="absolute inset-0 bg-gradient-to-t from-mil-dark via-transparent to-mil-dark/40" />
         </div>
 
         {/* Grid overlay */}
