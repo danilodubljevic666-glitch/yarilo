@@ -1,15 +1,20 @@
+import Image from "next/image";
+import { createClient } from "@/lib/supabase/server";
 import { Animate, Stagger, StaggerItem } from "@/components/Animate";
+import { CATEGORIES } from "@/types/database";
+import type { Product } from "@/types/database";
 
-const categories = [
-  { id: "rifles",      label: "Puške",                  icon: "⬡", desc: "AEG, Spring i Gas puške — M4, AK, snajperi i više" },
-  { id: "pistols",     label: "Pištolji",               icon: "⬡", desc: "CO₂ i Green Gas pištolji za CQB i backup" },
-  { id: "ammo",        label: "Metci (BB)",              icon: "⬡", desc: "BB kuglice 6mm raznih gramatura — 0.20g, 0.25g, 0.28g" },
-  { id: "gear",        label: "Odijela & Taktička oprema", icon: "⬡", desc: "Woodland, multicam, urban — odijela i prsluci" },
-  { id: "helmets",     label: "Kacige & Zaštita",        icon: "⬡", desc: "Taktičke kacige, zaštitne naočare i maske" },
-  { id: "accessories", label: "Dodaci",                  icon: "⬡", desc: "Silenceri, rukovati, optika, baterije i punjači" },
-];
+export const dynamic = "force-dynamic";
 
-export default function ShopPage() {
+export default async function ShopPage() {
+  const supabase = await createClient();
+  const { data: products = [] } = await supabase
+    .from("products")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  const hasProducts = products && products.length > 0;
+
   return (
     <>
       {/* ── Page Header ── */}
@@ -29,105 +34,159 @@ export default function ShopPage() {
           </Animate>
           <Animate variant="fadeIn" delay={0.3}>
             <p className="text-mil-text/60 max-w-xl text-sm leading-relaxed">
-              Airsoft replike, oprema, zaštita i dodaci — sve na jednom
-              mjestu. Shop dolazi uskoro.
+              Airsoft replike, oprema, zaštita i dodaci. Za kupovinu nas kontaktirajte
+              direktno putem telefona ili Instagrama.
             </p>
           </Animate>
         </div>
       </section>
 
-      {/* ── Coming Soon Banner ── */}
+      {/* ── Contact banner ── */}
       <Animate variant="slideDown">
         <section className="py-4 px-4 sm:px-6 bg-mil-green-mid/10 border-b border-mil-green-mid/30">
           <div className="max-w-7xl mx-auto flex items-center gap-4">
             <div className="w-2 h-2 bg-mil-green-light rounded-full pulse-dot" />
-            <p className="text-mil-green-light text-sm tracking-[0.15em] uppercase font-semibold"
+            <p className="text-mil-green-light text-sm tracking-[0.1em]"
               style={{ fontFamily: "var(--font-rajdhani)" }}>
-              Online prodavnica — u pripremi. Kontaktirajte nas direktno za kupovinu opreme.
+              Za narudžbu nas kontaktirajte:&nbsp;
+              <a href="tel:+38269566781" className="underline hover:text-white transition-colors">
+                +382 69 566 781
+              </a>
+              &nbsp;ili putem&nbsp;
+              <a href="https://www.instagram.com/yarilo_airsoft/" target="_blank" rel="noopener noreferrer"
+                className="underline hover:text-white transition-colors">
+                Instagrama
+              </a>
             </p>
           </div>
         </section>
       </Animate>
 
-      {/* ── Categories ── */}
-      <section className="py-20 px-4 sm:px-6">
+      {/* ── Products ── */}
+      <section className="py-16 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="mb-12">
-            <Animate variant="fadeIn">
-              <span className="text-mil-gold text-xs tracking-[0.4em] uppercase mb-3 block"
-                style={{ fontFamily: "var(--font-rajdhani)" }}>Kategorije</span>
-            </Animate>
-            <Animate variant="slideUp" delay={0.1}>
-              <h2 className="section-title text-3xl sm:text-4xl font-bold text-white">
-                Šta ćemo <span className="text-mil-green-light">nuditi</span>
-              </h2>
-            </Animate>
-          </div>
 
-          <Stagger className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5" staggerDelay={0.07}>
-            {categories.map((cat) => (
-              <StaggerItem key={cat.id} variant="scaleUp">
-                <div className="relative bg-mil-card border border-mil-border p-8 clip-corner group overflow-hidden transition-all duration-200 hover:border-mil-border/60 glow-on-hover">
-                  {/* Disabled overlay on hover */}
-                  <div className="absolute inset-0 bg-mil-dark/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-                    <span className="text-mil-text/40 text-xs tracking-[0.3em] uppercase"
-                      style={{ fontFamily: "var(--font-rajdhani)" }}>Uskoro dostupno</span>
-                  </div>
-                  <span className="text-mil-green-light text-3xl block mb-4 opacity-40 group-hover:opacity-20 transition-opacity">
-                    {cat.icon}
-                  </span>
-                  <h3 className="text-white font-bold text-lg tracking-wide uppercase mb-3"
-                    style={{ fontFamily: "var(--font-rajdhani)" }}>
-                    {cat.label}
-                  </h3>
-                  <p className="text-mil-text/40 text-xs leading-relaxed">{cat.desc}</p>
+          {!hasProducts ? (
+            /* Empty state */
+            <Animate variant="scaleIn" delay={0.1}>
+              <div className="border border-dashed border-mil-border p-16 sm:p-24 text-center clip-corner">
+                <div className="w-16 h-16 border-2 border-mil-border mx-auto mb-6 flex items-center justify-center float-anim">
+                  <span className="text-mil-border text-2xl">⬡</span>
                 </div>
-              </StaggerItem>
-            ))}
-          </Stagger>
-        </div>
-      </section>
-
-      {/* ── Empty product area ── */}
-      <section className="py-16 px-4 sm:px-6 bg-mil-card border-t border-mil-border">
-        <div className="max-w-7xl mx-auto">
-          <div className="mb-8 flex items-center justify-between">
-            <Animate variant="fadeIn">
-              <h2 className="section-title text-2xl font-bold text-white uppercase">Proizvodi</h2>
-            </Animate>
-            <Animate variant="fadeIn">
-              <span className="text-mil-muted text-xs tracking-[0.2em] uppercase">0 proizvoda</span>
-            </Animate>
-          </div>
-
-          <Animate variant="scaleIn" delay={0.1}>
-            <div className="border border-dashed border-mil-border p-16 sm:p-24 text-center clip-corner">
-              <div className="w-16 h-16 border-2 border-mil-border mx-auto mb-6 flex items-center justify-center float-anim">
-                <span className="text-mil-border text-2xl">⬡</span>
-              </div>
-              <h3 className="text-mil-text/30 text-lg font-bold uppercase tracking-[0.2em] mb-3"
-                style={{ fontFamily: "var(--font-rajdhani)" }}>
-                Proizvodi dolaze uskoro
-              </h3>
-              <p className="text-mil-muted text-xs leading-relaxed max-w-sm mx-auto mb-8">
-                Radimo na postavljanju online prodavnice. Za sada, kontaktirajte
-                nas direktno za informacije o dostupnoj opremi.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="tel:+38269566781"
-                  className="inline-flex items-center justify-center px-6 py-3 bg-mil-green-mid hover:bg-mil-green-light text-white text-xs font-semibold tracking-[0.15em] uppercase clip-corner-sm transition-all hover:scale-105"
+                <h3 className="text-mil-text/30 text-lg font-bold uppercase tracking-[0.2em] mb-3"
                   style={{ fontFamily: "var(--font-rajdhani)" }}>
-                  +382 69 566 781
-                </a>
-                <a href="https://www.instagram.com/yarilo_airsoft/"
-                  target="_blank" rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center px-6 py-3 border border-mil-border hover:border-mil-gold text-mil-text/50 hover:text-mil-gold text-xs font-semibold tracking-[0.15em] uppercase clip-corner-sm transition-all hover:scale-105"
-                  style={{ fontFamily: "var(--font-rajdhani)" }}>
-                  Instagram DM
-                </a>
+                  Proizvodi dolaze uskoro
+                </h3>
+                <p className="text-mil-muted text-xs leading-relaxed max-w-sm mx-auto mb-8">
+                  Radimo na postavljanju online prodavnice. Za sada, kontaktirajte
+                  nas direktno za informacije o dostupnoj opremi.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <a href="tel:+38269566781"
+                    className="inline-flex items-center justify-center px-6 py-3 bg-mil-green-mid hover:bg-mil-green-light text-white text-xs font-semibold tracking-[0.15em] uppercase clip-corner-sm transition-all hover:scale-105"
+                    style={{ fontFamily: "var(--font-rajdhani)" }}>
+                    +382 69 566 781
+                  </a>
+                  <a href="https://www.instagram.com/yarilo_airsoft/" target="_blank" rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center px-6 py-3 border border-mil-border hover:border-mil-gold text-mil-text/50 hover:text-mil-gold text-xs font-semibold tracking-[0.15em] uppercase clip-corner-sm transition-all hover:scale-105"
+                    style={{ fontFamily: "var(--font-rajdhani)" }}>
+                    Instagram DM
+                  </a>
+                </div>
               </div>
+            </Animate>
+          ) : (
+            /* Product grid grouped by category */
+            <div className="space-y-14">
+              {CATEGORIES.map((cat) => {
+                const catProducts = (products as Product[]).filter(
+                  (p) => p.category === cat.value
+                );
+                if (catProducts.length === 0) return null;
+
+                return (
+                  <div key={cat.value}>
+                    <Animate variant="slideLeft">
+                      <div className="flex items-center gap-4 mb-6">
+                        <h2 className="section-title text-xl font-bold text-white">
+                          {cat.label}
+                        </h2>
+                        <div className="flex-1 h-px bg-mil-border" />
+                        <span className="text-mil-muted text-xs tracking-[0.2em]">
+                          {catProducts.length} proizvoda
+                        </span>
+                      </div>
+                    </Animate>
+
+                    <Stagger className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5" staggerDelay={0.07}>
+                      {catProducts.map((product) => (
+                        <StaggerItem key={product.id} variant="scaleUp">
+                          <div className="bg-mil-card border border-mil-border clip-corner overflow-hidden group hover:border-mil-green-mid transition-all duration-300 glow-on-hover flex flex-col">
+                            {/* Image */}
+                            <div className="relative h-52 bg-mil-surface overflow-hidden">
+                              {product.image_url ? (
+                                <Image
+                                  src={product.image_url}
+                                  alt={product.name}
+                                  fill
+                                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                                  sizes="(max-width:640px) 100vw,(max-width:1024px) 50vw,25vw"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center">
+                                  <span className="text-mil-border/40 text-4xl">⬡</span>
+                                </div>
+                              )}
+                              <div className="absolute inset-0 bg-gradient-to-t from-mil-card/60 to-transparent" />
+
+                              {/* Stock badge */}
+                              <div className="absolute top-3 left-3">
+                                <span className={`text-[9px] px-2 py-1 font-semibold tracking-[0.15em] uppercase ${
+                                  product.in_stock
+                                    ? "bg-mil-green-mid/90 text-white"
+                                    : "bg-mil-dark/80 text-mil-muted border border-mil-border"
+                                }`} style={{ fontFamily: "var(--font-rajdhani)" }}>
+                                  {product.in_stock ? "Na stanju" : "Nema"}
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Content */}
+                            <div className="p-5 flex flex-col flex-1">
+                              <h3 className="text-white font-bold text-base mb-1 group-hover:text-mil-green-light transition-colors"
+                                style={{ fontFamily: "var(--font-rajdhani)" }}>
+                                {product.name}
+                              </h3>
+                              {product.description && (
+                                <p className="text-mil-text/50 text-xs leading-relaxed mb-3 line-clamp-2">
+                                  {product.description}
+                                </p>
+                              )}
+                              <div className="mt-auto flex items-center justify-between pt-4 border-t border-mil-border">
+                                <span className="text-xl font-bold text-mil-gold"
+                                  style={{ fontFamily: "var(--font-rajdhani)" }}>
+                                  €{Number(product.price).toFixed(2)}
+                                </span>
+                                <a
+                                  href={`https://www.instagram.com/yarilo_airsoft/`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="px-4 py-2 bg-mil-green-mid hover:bg-mil-green-light text-white text-xs font-semibold tracking-[0.1em] uppercase clip-corner-sm transition-all"
+                                  style={{ fontFamily: "var(--font-rajdhani)" }}
+                                >
+                                  Kontakt →
+                                </a>
+                              </div>
+                            </div>
+                          </div>
+                        </StaggerItem>
+                      ))}
+                    </Stagger>
+                  </div>
+                );
+              })}
             </div>
-          </Animate>
+          )}
         </div>
       </section>
     </>
