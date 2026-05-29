@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "./_actions/auth";
 
@@ -13,8 +12,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  // Middleware handles redirect for most cases, this is a safety net
-  if (!user) redirect("/admin/login");
+  // Layout applies to /admin/login too, so we can't redirect here.
+  // Middleware handles auth protection for all other /admin/* routes.
+  // If no user, just render children (the login page).
+  if (!user) return <>{children}</>;
 
   return (
     <div className="min-h-screen bg-mil-dark flex">
