@@ -15,7 +15,7 @@ const navLinks = [
   { href: "/contact", label: "Kontakt" },
 ];
 
-const ease = [0.22, 1, 0.36, 1];
+const ease: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 export default function Navbar() {
   const [open, setOpen]       = useState(false);

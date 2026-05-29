@@ -34,7 +34,7 @@ const variants: Record<string, Variants> = {
   },
 };
 
-const ease = [0.22, 1, 0.36, 1] as const;
+const ease: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 interface AnimateProps {
   children: ReactNode;
