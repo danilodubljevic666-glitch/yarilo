@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
+import { usePreloaderDone } from "@/context/PreloaderContext";
 
 const LETTERS = ["Y", "A", "R", "I", "L", "O"];
 
@@ -10,24 +11,22 @@ export default function Preloader() {
   const [progress, setProgress] = useState(0);
   const [done, setDone] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const { markDone } = usePreloaderDone();
 
   useEffect(() => {
     setMounted(true);
 
-    // Progress bar fills from 0 to 100 over ~1.8s with easing
     const start = performance.now();
     const duration = 1800;
 
     const tick = (now: number) => {
       const elapsed = now - start;
       const t = Math.min(elapsed / duration, 1);
-      // Ease-out cubic
       const eased = 1 - Math.pow(1 - t, 3);
       setProgress(Math.floor(eased * 100));
       if (t < 1) {
         requestAnimationFrame(tick);
       } else {
-        // Small pause at 100% before hiding
         setTimeout(() => setDone(true), 400);
       }
     };
@@ -35,23 +34,27 @@ export default function Preloader() {
     requestAnimationFrame(tick);
   }, []);
 
-  // Don't render on server
   if (!mounted) return null;
 
   return (
-    <AnimatePresence>
+    <AnimatePresence
+      onExitComplete={() => {
+        // Signal all Animate components that they can now start
+        markDone();
+        // Gate CSS hero animations behind this class
+        document.body.classList.add("preloader-done");
+      }}
+    >
       {!done && (
         <motion.div
           key="preloader"
           initial={{ opacity: 1 }}
           exit={{ opacity: 0, scale: 1.02 }}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }}
           className="fixed inset-0 z-[100] bg-mil-dark flex flex-col items-center justify-center overflow-hidden"
         >
-          {/* Background grid */}
           <div className="absolute inset-0 military-grid opacity-40" />
 
-          {/* Scanline */}
           <motion.div
             className="absolute inset-x-0 h-px bg-gradient-to-r from-transparent via-mil-green-light/40 to-transparent"
             initial={{ top: "-2%" }}
@@ -59,7 +62,6 @@ export default function Preloader() {
             transition={{ duration: 2.2, ease: "linear", repeat: Infinity }}
           />
 
-          {/* Corner accents */}
           {[
             "top-8 left-8 border-l-2 border-t-2",
             "top-8 right-8 border-r-2 border-t-2",
@@ -75,24 +77,14 @@ export default function Preloader() {
             />
           ))}
 
-          {/* Main content */}
           <div className="relative flex flex-col items-center gap-8">
-            {/* Logo */}
             <motion.div
               initial={{ opacity: 0, scale: 0.7 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }}
               className="relative w-20 h-20 clip-corner overflow-hidden"
             >
-              <Image
-                src="/yariloLogo.jpg"
-                alt="Yarilo"
-                fill
-                className="object-cover"
-                sizes="80px"
-                priority
-              />
-              {/* Green border glow */}
+              <Image src="/yariloLogo.jpg" alt="Yarilo" fill className="object-cover" sizes="80px" priority />
               <motion.div
                 className="absolute inset-0 border-2 border-mil-green-light/60 clip-corner"
                 animate={{ opacity: [0.4, 1, 0.4] }}
@@ -100,7 +92,6 @@ export default function Preloader() {
               />
             </motion.div>
 
-            {/* YARILO — letters stagger in */}
             <div className="flex items-end gap-1 sm:gap-2">
               {LETTERS.map((letter, i) => (
                 <motion.span
@@ -120,7 +111,6 @@ export default function Preloader() {
               ))}
             </div>
 
-            {/* Subtitle */}
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -131,7 +121,6 @@ export default function Preloader() {
               Airsoft Klub · Crna Gora
             </motion.p>
 
-            {/* Progress bar */}
             <motion.div
               initial={{ opacity: 0, width: 0 }}
               animate={{ opacity: 1, width: "240px" }}
@@ -142,16 +131,13 @@ export default function Preloader() {
               <motion.div
                 className="absolute inset-y-0 left-0 bg-mil-green-light"
                 style={{ width: `${progress}%` }}
-                transition={{ ease: "linear" }}
               />
-              {/* Glow on leading edge */}
               <motion.div
                 className="absolute inset-y-0 w-6 bg-gradient-to-r from-transparent to-mil-green-light/60"
                 style={{ left: `calc(${progress}% - 24px)` }}
               />
             </motion.div>
 
-            {/* Percentage */}
             <motion.span
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
