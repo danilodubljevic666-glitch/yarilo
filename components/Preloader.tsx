@@ -1,48 +1,68 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePreloaderDone } from "@/context/PreloaderContext";
 
 const LETTERS = ["Y", "A", "R", "I", "L", "O"];
+const DURATION = 1800;
+// Exit animation is 600ms — backup fires after that + buffer
+const EXIT_BACKUP_MS = 1200;
+
+function finish() {
+  document.body.classList.add("preloader-done");
+}
 
 export default function Preloader() {
   const [progress, setProgress] = useState(0);
   const [done, setDone] = useState(false);
   const [mounted, setMounted] = useState(false);
   const { markDone } = usePreloaderDone();
+  const backupRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Progress counter — uses setInterval (reliable on all mobile browsers,
+  // unlike requestAnimationFrame which pauses when tab is in background)
   useEffect(() => {
     setMounted(true);
+    const start = Date.now();
 
-    const start = performance.now();
-    const duration = 1800;
-
-    const tick = (now: number) => {
-      const elapsed = now - start;
-      const t = Math.min(elapsed / duration, 1);
+    const id = setInterval(() => {
+      const t = Math.min((Date.now() - start) / DURATION, 1);
       const eased = 1 - Math.pow(1 - t, 3);
       setProgress(Math.floor(eased * 100));
-      if (t < 1) {
-        requestAnimationFrame(tick);
-      } else {
+      if (t >= 1) {
+        clearInterval(id);
         setTimeout(() => setDone(true), 400);
       }
-    };
+    }, 16);
 
-    requestAnimationFrame(tick);
+    return () => clearInterval(id);
   }, []);
+
+  // When local `done` flips, start backup timer.
+  // If onExitComplete doesn't fire (mobile Safari quirk),
+  // this guarantees markDone() is still called.
+  useEffect(() => {
+    if (!done) return;
+    backupRef.current = setTimeout(() => {
+      markDone();
+      finish();
+    }, EXIT_BACKUP_MS);
+    return () => {
+      if (backupRef.current) clearTimeout(backupRef.current);
+    };
+  }, [done, markDone]);
 
   if (!mounted) return null;
 
   return (
     <AnimatePresence
       onExitComplete={() => {
-        // Signal all Animate components that they can now start
+        // Primary path — clear backup and fire immediately
+        if (backupRef.current) clearTimeout(backupRef.current);
         markDone();
-        // Gate CSS hero animations behind this class
-        document.body.classList.add("preloader-done");
+        finish();
       }}
     >
       {!done && (
@@ -128,11 +148,11 @@ export default function Preloader() {
               className="relative h-px bg-mil-border overflow-hidden"
               style={{ width: 240 }}
             >
-              <motion.div
-                className="absolute inset-y-0 left-0 bg-mil-green-light"
+              <div
+                className="absolute inset-y-0 left-0 bg-mil-green-light transition-[width] duration-100"
                 style={{ width: `${progress}%` }}
               />
-              <motion.div
+              <div
                 className="absolute inset-y-0 w-6 bg-gradient-to-r from-transparent to-mil-green-light/60"
                 style={{ left: `calc(${progress}% - 24px)` }}
               />
