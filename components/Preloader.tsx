@@ -24,6 +24,10 @@ export default function Preloader() {
   // Progress counter — uses setInterval (reliable on all mobile browsers,
   // unlike requestAnimationFrame which pauses when tab is in background)
   useEffect(() => {
+    // Remove the static HTML overlay — React takes over from here
+    const staticEl = document.getElementById("preloader-static");
+    if (staticEl) staticEl.remove();
+
     setMounted(true);
     const start = Date.now();
 
@@ -71,7 +75,7 @@ export default function Preloader() {
           initial={{ opacity: 1 }}
           exit={{ opacity: 0, scale: 1.02 }}
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }}
-          className="fixed inset-0 z-[100] bg-mil-dark flex flex-col items-center justify-center overflow-hidden"
+          className="fixed inset-0 z-[9999] bg-mil-dark flex flex-col items-center justify-center overflow-hidden"
         >
           <div className="absolute inset-0 military-grid opacity-40" />
 

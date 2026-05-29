@@ -38,6 +38,24 @@ export default function RootLayout({
   return (
     <html lang="sr" className={rajdhani.variable}>
       <body className="min-h-screen flex flex-col bg-mil-dark text-mil-text antialiased">
+        {/*
+          Inline script — runs SYNCHRONOUSLY before any JS bundle loads.
+          Creates a dark overlay that hides page content on mobile while
+          the React preloader component is not yet hydrated.
+          The React Preloader removes this element when it mounts.
+        */}
+        <script
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{
+            __html: `(function(){
+  var el=document.createElement('div');
+  el.id='preloader-static';
+  el.style.cssText='position:fixed;inset:0;z-index:9998;background:#0a0a0a;display:flex;align-items:center;justify-content:center;';
+  el.innerHTML='<img src="/yariloLogo.jpg" style="width:72px;height:72px;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,0 100%);object-fit:cover;" alt="" />';
+  document.body.appendChild(el);
+})();`,
+          }}
+        />
         <PreloaderProvider>
           <Preloader />
           <Navbar />
