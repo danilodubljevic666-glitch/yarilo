@@ -12,12 +12,17 @@ interface Props {
   product?: Product;
 }
 
+type ImageEntry =
+  | { kind: "existing"; url: string }
+  | { kind: "new"; file: File; preview: string };
+
 export default function ProductForm({ product }: Props) {
   const isEdit = !!product;
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
 
   const [form, setForm] = useState({
     name:        product?.name        ?? "",
@@ -27,40 +32,51 @@ export default function ProductForm({ product }: Props) {
     in_stock:    product?.in_stock    ?? true,
   });
 
-  const [imageFile, setImageFile]       = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(product?.image_url ?? null);
-  const [uploading, setUploading]       = useState(false);
+  const [images, setImages] = useState<ImageEntry[]>(
+    (product?.images ?? []).map((url) => ({ kind: "existing", url }))
+  );
 
   function handleField(field: string, value: string | boolean) {
     setForm((prev) => ({ ...prev, [field]: value }));
   }
 
-  function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setImageFile(file);
-    setImagePreview(URL.createObjectURL(file));
+  function handleFiles(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []);
+    const newEntries: ImageEntry[] = files.map((file) => ({
+      kind: "new",
+      file,
+      preview: URL.createObjectURL(file),
+    }));
+    setImages((prev) => [...prev, ...newEntries]);
+    e.target.value = "";
   }
 
-  async function uploadImage(): Promise<string | null> {
-    if (!imageFile) return product?.image_url ?? null;
-    setUploading(true);
+  function removeImage(index: number) {
+    setImages((prev) => prev.filter((_, i) => i !== index));
+  }
+
+  async function uploadAllImages(): Promise<string[]> {
     const supabase = createClient();
-    const ext = imageFile.name.split(".").pop();
-    const path = `products/${Date.now()}.${ext}`;
+    const urls: string[] = [];
 
-    const { data, error } = await supabase.storage
-      .from("product-images")
-      .upload(path, imageFile, { upsert: true });
+    for (const entry of images) {
+      if (entry.kind === "existing") {
+        urls.push(entry.url);
+        continue;
+      }
+      const ext = entry.file.name.split(".").pop();
+      const path = `products/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const { data, error: uploadErr } = await supabase.storage
+        .from("product-images")
+        .upload(path, entry.file, { upsert: true });
+      if (uploadErr) throw new Error("Greška pri uploadu: " + uploadErr.message);
+      const { data: { publicUrl } } = supabase.storage
+        .from("product-images")
+        .getPublicUrl(data.path);
+      urls.push(publicUrl);
+    }
 
-    setUploading(false);
-    if (error) { setError("Greška pri uploadu slike: " + error.message); return null; }
-
-    const { data: { publicUrl } } = supabase.storage
-      .from("product-images")
-      .getPublicUrl(data.path);
-
-    return publicUrl;
+    return urls;
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -72,8 +88,16 @@ export default function ProductForm({ product }: Props) {
       return;
     }
 
-    const imageUrl = await uploadImage();
-    if (uploading) return;
+    setUploading(true);
+    let imageUrls: string[];
+    try {
+      imageUrls = await uploadAllImages();
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Greška pri uploadu.");
+      setUploading(false);
+      return;
+    }
+    setUploading(false);
 
     const payload = {
       name:        form.name.trim(),
@@ -81,7 +105,7 @@ export default function ProductForm({ product }: Props) {
       price:       parseFloat(form.price),
       category:    form.category,
       in_stock:    form.in_stock,
-      image_url:   imageUrl,
+      images:      imageUrls,
     };
 
     startTransition(async () => {
@@ -103,49 +127,86 @@ export default function ProductForm({ product }: Props) {
 
   return (
     <form onSubmit={handleSubmit} className="max-w-2xl space-y-6">
-      {/* Image upload */}
+
+      {/* ── Image upload ── */}
       <div>
         <label className="text-[10px] tracking-[0.25em] uppercase text-mil-muted block mb-3"
           style={{ fontFamily: "var(--font-rajdhani)" }}>
-          Slika proizvoda
+          Slike proizvoda
+          <span className="ml-2 text-mil-border normal-case tracking-normal">({images.length} dodato)</span>
         </label>
-        <div
-          onClick={() => fileInputRef.current?.click()}
-          className="relative border-2 border-dashed border-mil-border hover:border-mil-green-mid transition-colors cursor-pointer clip-corner overflow-hidden"
-          style={{ height: imagePreview ? 240 : 140 }}
-        >
-          {imagePreview ? (
-            <>
-              <Image src={imagePreview} alt="Preview" fill className="object-contain p-2" sizes="672px" />
-              <div className="absolute inset-0 bg-mil-dark/60 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
-                <span className="text-white text-xs tracking-[0.2em] uppercase"
-                  style={{ fontFamily: "var(--font-rajdhani)" }}>Promijeni sliku</span>
-              </div>
-            </>
-          ) : (
-            <div className="h-full flex flex-col items-center justify-center gap-2 text-mil-muted">
-              <span className="text-3xl opacity-30">⬡</span>
-              <span className="text-xs tracking-[0.15em] uppercase"
-                style={{ fontFamily: "var(--font-rajdhani)" }}>Klikni za upload</span>
-              <span className="text-[10px] opacity-50">JPG, PNG, WEBP</span>
-            </div>
-          )}
-        </div>
+
+        {/* Thumbnails grid */}
+        {images.length > 0 && (
+          <div className="grid grid-cols-4 gap-3 mb-3">
+            {images.map((entry, i) => {
+              const src = entry.kind === "existing" ? entry.url : entry.preview;
+              return (
+                <div key={i} className="relative group aspect-square bg-mil-surface clip-corner overflow-hidden border border-mil-border">
+                  <Image src={src} alt="" fill className="object-cover" sizes="160px" />
+                  {i === 0 && (
+                    <span className="absolute top-1 left-1 text-[8px] bg-mil-green-mid text-white px-1.5 py-0.5 tracking-wider uppercase"
+                      style={{ fontFamily: "var(--font-rajdhani)" }}>
+                      Cover
+                    </span>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => removeImage(i)}
+                    className="absolute top-1 right-1 w-6 h-6 bg-mil-dark/80 border border-mil-border text-mil-muted hover:text-red-400 hover:border-red-400/50 text-xs opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center"
+                  >
+                    ✕
+                  </button>
+                </div>
+              );
+            })}
+
+            {/* Add more */}
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="aspect-square border-2 border-dashed border-mil-border hover:border-mil-green-mid transition-colors clip-corner flex flex-col items-center justify-center gap-1 text-mil-muted hover:text-mil-green-light"
+            >
+              <span className="text-xl leading-none">+</span>
+              <span className="text-[9px] tracking-wider uppercase" style={{ fontFamily: "var(--font-rajdhani)" }}>Dodaj</span>
+            </button>
+          </div>
+        )}
+
+        {/* Empty state drop zone */}
+        {images.length === 0 && (
+          <div
+            onClick={() => fileInputRef.current?.click()}
+            className="border-2 border-dashed border-mil-border hover:border-mil-green-mid transition-colors cursor-pointer clip-corner h-36 flex flex-col items-center justify-center gap-2 text-mil-muted"
+          >
+            <span className="text-3xl opacity-30">⬡</span>
+            <span className="text-xs tracking-[0.15em] uppercase" style={{ fontFamily: "var(--font-rajdhani)" }}>
+              Klikni za upload slika
+            </span>
+            <span className="text-[10px] opacity-50">JPG, PNG, WEBP — više slika odjednom</span>
+          </div>
+        )}
+
         <input
           ref={fileInputRef}
           type="file"
           accept="image/*"
-          onChange={handleFile}
+          multiple
+          onChange={handleFiles}
           className="hidden"
         />
+
+        {images.length > 0 && (
+          <p className="text-[10px] text-mil-muted mt-1.5">
+            Prva slika je cover. Povuci za promjenu redosljeda nije podržano — ukloni i ponovo dodaj.
+          </p>
+        )}
       </div>
 
       {/* Name */}
       <div>
         <label className="text-[10px] tracking-[0.25em] uppercase text-mil-muted block mb-2"
-          style={{ fontFamily: "var(--font-rajdhani)" }}>
-          Naziv *
-        </label>
+          style={{ fontFamily: "var(--font-rajdhani)" }}>Naziv *</label>
         <input
           type="text"
           value={form.name}
@@ -159,9 +220,7 @@ export default function ProductForm({ product }: Props) {
       {/* Description */}
       <div>
         <label className="text-[10px] tracking-[0.25em] uppercase text-mil-muted block mb-2"
-          style={{ fontFamily: "var(--font-rajdhani)" }}>
-          Opis
-        </label>
+          style={{ fontFamily: "var(--font-rajdhani)" }}>Opis</label>
         <textarea
           value={form.description}
           onChange={(e) => handleField("description", e.target.value)}
@@ -171,13 +230,11 @@ export default function ProductForm({ product }: Props) {
         />
       </div>
 
-      {/* Price + Category row */}
+      {/* Price + Category */}
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="text-[10px] tracking-[0.25em] uppercase text-mil-muted block mb-2"
-            style={{ fontFamily: "var(--font-rajdhani)" }}>
-            Cijena (€) *
-          </label>
+            style={{ fontFamily: "var(--font-rajdhani)" }}>Cijena (€) *</label>
           <input
             type="number"
             value={form.price}
@@ -191,9 +248,7 @@ export default function ProductForm({ product }: Props) {
         </div>
         <div>
           <label className="text-[10px] tracking-[0.25em] uppercase text-mil-muted block mb-2"
-            style={{ fontFamily: "var(--font-rajdhani)" }}>
-            Kategorija *
-          </label>
+            style={{ fontFamily: "var(--font-rajdhani)" }}>Kategorija *</label>
           <select
             value={form.category}
             onChange={(e) => handleField("category", e.target.value as Category)}

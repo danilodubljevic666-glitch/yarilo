@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { Animate, Stagger, StaggerItem } from "@/components/Animate";
 import { CATEGORIES } from "@/types/database";
@@ -121,12 +122,15 @@ export default async function ShopPage() {
                     <Stagger className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5" staggerDelay={0.07}>
                       {catProducts.map((product) => (
                         <StaggerItem key={product.id} variant="scaleUp">
-                          <div className="bg-mil-card border border-mil-border clip-corner overflow-hidden group hover:border-mil-green-mid transition-all duration-300 glow-on-hover flex flex-col">
+                          <Link
+                            href={`/shop/${product.id}`}
+                            className="bg-mil-card border border-mil-border clip-corner overflow-hidden group hover:border-mil-green-mid transition-all duration-300 glow-on-hover flex flex-col block"
+                          >
                             {/* Image */}
                             <div className="relative h-52 bg-mil-surface overflow-hidden">
-                              {product.image_url ? (
+                              {product.images?.[0] ? (
                                 <Image
-                                  src={product.image_url}
+                                  src={product.images[0]}
                                   alt={product.name}
                                   fill
                                   className="object-cover transition-transform duration-700 group-hover:scale-105"
@@ -149,6 +153,16 @@ export default async function ShopPage() {
                                   {product.in_stock ? "Na stanju" : "Nema"}
                                 </span>
                               </div>
+
+                              {/* Multiple images indicator */}
+                              {product.images?.length > 1 && (
+                                <div className="absolute bottom-3 right-3">
+                                  <span className="text-[9px] bg-mil-dark/80 border border-mil-border text-mil-muted px-2 py-0.5 tracking-wider"
+                                    style={{ fontFamily: "var(--font-rajdhani)" }}>
+                                    {product.images.length} slike
+                                  </span>
+                                </div>
+                              )}
                             </div>
 
                             {/* Content */}
@@ -167,18 +181,13 @@ export default async function ShopPage() {
                                   style={{ fontFamily: "var(--font-rajdhani)" }}>
                                   €{Number(product.price).toFixed(2)}
                                 </span>
-                                <a
-                                  href={`https://www.instagram.com/yarilo_airsoft/`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="px-4 py-2 bg-mil-green-mid hover:bg-mil-green-light text-white text-xs font-semibold tracking-[0.1em] uppercase clip-corner-sm transition-all"
-                                  style={{ fontFamily: "var(--font-rajdhani)" }}
-                                >
-                                  Kontakt →
-                                </a>
+                                <span className="px-4 py-2 bg-mil-green-mid group-hover:bg-mil-green-light text-white text-xs font-semibold tracking-[0.1em] uppercase clip-corner-sm transition-all"
+                                  style={{ fontFamily: "var(--font-rajdhani)" }}>
+                                  Pogledaj →
+                                </span>
                               </div>
                             </div>
-                          </div>
+                          </Link>
                         </StaggerItem>
                       ))}
                     </Stagger>

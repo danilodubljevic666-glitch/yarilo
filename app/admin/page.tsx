@@ -85,8 +85,8 @@ export default async function AdminDashboard() {
                   {/* Image */}
                   <td className="px-4 py-3 w-16">
                     <div className="w-12 h-12 bg-mil-surface clip-corner-sm overflow-hidden relative flex-shrink-0">
-                      {product.image_url ? (
-                        <Image src={product.image_url} alt={product.name} fill
+                      {product.images?.[0] ? (
+                        <Image src={product.images[0]} alt={product.name} fill
                           className="object-cover" sizes="48px" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
