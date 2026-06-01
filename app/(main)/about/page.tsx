@@ -1,5 +1,21 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import { Animate, Stagger, StaggerItem } from "@/components/Animate";
+
+export const metadata: Metadata = {
+  title: "O Klubu",
+  description:
+    "Upoznajte Yarilo Airsoft Klub — naš tim, misiju i vrijednosti. Airsoft klub iz Podgorice koji okuplja strastvene igrače širom Crne Gore.",
+  keywords:
+    "yarilo airsoft tim, yarilo airsoft klub crna gora, airsoft crna gora, yarilo, o klubu, airsoft podgorica tim",
+  alternates: { canonical: "/about" },
+  openGraph: {
+    title: "O Klubu | Yarilo Airsoft Klub",
+    description:
+      "Upoznajte Yarilo Airsoft Klub — naš tim, misiju i vrijednosti. Airsoft klub iz Podgorice.",
+    url: "/about",
+  },
+};
 
 const team = [
   {

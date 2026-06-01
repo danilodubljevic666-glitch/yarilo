@@ -1,4 +1,21 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Yarilo Airsoft Klub | Crna Gora",
+  description:
+    "Yarilo Airsoft Klub — vodeći airsoft klub u Crnoj Gori. Organizujemo skirmish mečeve, mil-sim operacije i treninge za sve nivoe u Podgorici i okolini.",
+  keywords:
+    "airsoft crna gora, yarilo airsoft klub, yarilo, airsoft yarilo, airsoft podgorica, skirmish crna gora, mil-sim crna gora, airsoft klub",
+  alternates: { canonical: "/" },
+  openGraph: {
+    title: "Yarilo Airsoft Klub | Crna Gora",
+    description:
+      "Vodeći airsoft klub u Crnoj Gori — skirmish mečevi, mil-sim operacije i treninzi u Podgorici.",
+    url: "/",
+    type: "website",
+  },
+};
 import Image from "next/image";
 import { Animate, Stagger, StaggerItem } from "@/components/Animate";
 import HeroAnimated from "@/components/HeroAnimated";

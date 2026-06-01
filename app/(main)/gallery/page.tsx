@@ -1,4 +1,20 @@
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
+
+export const metadata: Metadata = {
+  title: "Galerija",
+  description:
+    "Fotogalerija Yarilo Airsoft Kluba — slike sa skirmish mečeva, mil-sim operacija i terena širom Crne Gore. Pogledajte akcije u Podgorici, Cetinju i Danilovgradu.",
+  keywords:
+    "yarilo airsoft galerija, airsoft crna gora slike, airsoft eventi slike, airsoft yarilo foto, skirmish crna gora galerija",
+  alternates: { canonical: "/gallery" },
+  openGraph: {
+    title: "Galerija | Yarilo Airsoft Klub",
+    description:
+      "Slike sa airsoft mečeva i terena Yarilo kluba u Crnoj Gori.",
+    url: "/gallery",
+  },
+};
 import GalleryContent from "./_components/GalleryContent";
 import type { GalleryImage } from "./_components/GalleryContent";
 

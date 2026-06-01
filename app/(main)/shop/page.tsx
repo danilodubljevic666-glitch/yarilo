@@ -1,6 +1,22 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+
+export const metadata: Metadata = {
+  title: "Prodavnica Airsoft Opreme",
+  description:
+    "Kupite airsoft opremu u Crnoj Gori — puške, pištolje, metke, odijela, kacige i dodatke. Yarilo Airsoft Klub nudi kvalitetnu opremu za sve igrače.",
+  keywords:
+    "airsoft oprema crna gora, airsoft puške crna gora, airsoft pištolji crna gora, airsoft kupovina crna gora, yarilo airsoft shop, airsoft metci crna gora, airsoft odijela crna gora",
+  alternates: { canonical: "/shop" },
+  openGraph: {
+    title: "Prodavnica Airsoft Opreme | Yarilo Airsoft Klub",
+    description:
+      "Airsoft oprema u Crnoj Gori — puške, pištolje, metke i dodaci. Yarilo Airsoft Klub.",
+    url: "/shop",
+  },
+};
 import { Animate, Stagger, StaggerItem } from "@/components/Animate";
 import { CATEGORIES } from "@/types/database";
 import type { Product } from "@/types/database";

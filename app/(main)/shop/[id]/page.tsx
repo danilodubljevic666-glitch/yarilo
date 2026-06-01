@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
@@ -6,6 +7,37 @@ import type { Product } from "@/types/database";
 import ProductGallery from "./_components/ProductGallery";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("products")
+    .select("name, description, images")
+    .eq("id", id)
+    .single();
+
+  if (!data) return { title: "Proizvod" };
+
+  const description =
+    data.description ??
+    `Kupi ${data.name} — airsoft oprema u Crnoj Gori. Yarilo Airsoft Klub.`;
+
+  return {
+    title: data.name,
+    description,
+    keywords: `${data.name}, airsoft oprema crna gora, yarilo airsoft shop, airsoft crna gora`,
+    openGraph: {
+      title: `${data.name} | Yarilo Airsoft Klub`,
+      description,
+      images: data.images?.[0] ? [{ url: data.images[0], alt: data.name }] : undefined,
+    },
+  };
+}
 
 export default async function ProductPage({
   params,

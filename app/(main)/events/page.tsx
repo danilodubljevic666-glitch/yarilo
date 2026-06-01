@@ -1,5 +1,21 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import { Animate, Stagger, StaggerItem } from "@/components/Animate";
+
+export const metadata: Metadata = {
+  title: "Eventi & Mečevi",
+  description:
+    "Airsoft eventi i mečevi Yarilo kluba u Crnoj Gori — skirmish, mil-sim i scenarijo igre na terenima u Podgorici, Cetinju i Danilovgradu. Prijavi se i igraj!",
+  keywords:
+    "airsoft eventi crna gora, airsoft mečevi crna gora, yarilo airsoft eventi, skirmish crna gora, mil-sim crna gora, airsoft cetinje, airsoft danilovgrad, airsoft podgorica",
+  alternates: { canonical: "/events" },
+  openGraph: {
+    title: "Eventi & Mečevi | Yarilo Airsoft Klub",
+    description:
+      "Airsoft skirmish i mil-sim eventi Yarilo kluba — tereni u Podgorici, Cetinju i Danilovgradu.",
+    url: "/events",
+  },
+};
 
 const events = [
   {

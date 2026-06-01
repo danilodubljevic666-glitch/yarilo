@@ -1,4 +1,20 @@
+import type { Metadata } from "next";
 import { Animate, Stagger, StaggerItem } from "@/components/Animate";
+
+export const metadata: Metadata = {
+  title: "Kontakt",
+  description:
+    "Kontaktirajte Yarilo Airsoft Klub — Podgorica, Crna Gora. Pozovite, pišite na Instagram ili se pridružite Viber grupi. Otvoreni smo za sve airsoft entuzijaste.",
+  keywords:
+    "yarilo airsoft kontakt, airsoft klub podgorica kontakt, yarilo kontakt, airsoft crna gora kontakt, viber airsoft crna gora",
+  alternates: { canonical: "/contact" },
+  openGraph: {
+    title: "Kontakt | Yarilo Airsoft Klub",
+    description:
+      "Kontaktirajte Yarilo Airsoft Klub iz Podgorice — telefon, email i Instagram.",
+    url: "/contact",
+  },
+};
 
 const contactInfo = [
   { label: "Lokacija",         value: "Podgorica, Crna Gora",                  href: null },
