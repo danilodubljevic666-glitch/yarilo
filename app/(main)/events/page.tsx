@@ -4,7 +4,7 @@ import { Animate, Stagger, StaggerItem } from "@/components/Animate";
 const events = [
   {
     id: 1,
-    title: "Fabrija OBOD",
+    title: "Fabrika OBOD",
     location: "Cetinje",
     date: "07. Nov 2024",
     capacity: "50 vs 50",
