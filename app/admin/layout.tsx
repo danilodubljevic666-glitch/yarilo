@@ -6,6 +6,7 @@ import { signOut } from "./_actions/auth";
 const navItems = [
   { href: "/admin",               label: "Dashboard",       icon: "⬡" },
   { href: "/admin/products/new",  label: "Dodaj proizvod",  icon: "+" },
+  { href: "/admin/gallery",       label: "Galerija",        icon: "◈" },
 ];
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {

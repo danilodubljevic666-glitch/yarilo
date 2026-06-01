@@ -14,6 +14,15 @@ export interface Product {
 export type ProductInsert = Omit<Product, "id" | "created_at">;
 export type ProductUpdate = Partial<ProductInsert>;
 
+export interface GalleryImageRow {
+  id: string;
+  url: string;
+  alt: string;
+  category: string;
+  span: string;
+  created_at: string;
+}
+
 export const CATEGORIES: { value: Category; label: string }[] = [
   { value: "puske",    label: "Puške" },
   { value: "pistolji", label: "Pištolji" },
