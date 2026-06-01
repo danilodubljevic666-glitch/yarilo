@@ -3,10 +3,12 @@ import Footer from "@/components/Footer";
 import Preloader from "@/components/Preloader";
 import ScrollToTop from "@/components/ScrollToTop";
 import { PreloaderProvider } from "@/context/PreloaderContext";
+import { CartProvider } from "@/context/CartContext";
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   return (
     <PreloaderProvider>
+      <CartProvider>
       <script
         // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{
@@ -24,6 +26,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
       <main className="flex-1">{children}</main>
       <Footer />
       <ScrollToTop />
+      </CartProvider>
     </PreloaderProvider>
   );
 }

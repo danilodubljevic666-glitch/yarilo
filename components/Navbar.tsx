@@ -5,6 +5,27 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import { useCart } from "@/context/CartContext";
+
+function CartIcon() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="9" cy="21" r="1" />
+      <circle cx="20" cy="21" r="1" />
+      <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+    </svg>
+  );
+}
 
 const navLinks = [
   { href: "/",        label: "Početna" },
@@ -18,10 +39,11 @@ const navLinks = [
 const ease: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 export default function Navbar() {
-  const [open, setOpen]       = useState(false);
+  const [open, setOpen]         = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const [mounted, setMounted]   = useState(false);
   const pathname = usePathname();
+  const { totalItems } = useCart();
 
   useEffect(() => {
     setMounted(true);
@@ -100,6 +122,27 @@ export default function Navbar() {
           })}
         </ul>
 
+        {/* Desktop cart icon */}
+        <motion.div
+          className="hidden md:flex"
+          initial={{ opacity: 0, x: 20 }}
+          animate={mounted ? { opacity: 1, x: 0 } : {}}
+          transition={{ duration: 0.6, delay: 0.6, ease }}
+        >
+          <Link
+            href="/korpa"
+            className="relative p-2 text-mil-text/70 hover:text-white transition-colors"
+            aria-label="Korpa"
+          >
+            <CartIcon />
+            {mounted && totalItems > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 bg-mil-green-mid text-white text-[9px] font-bold flex items-center justify-center rounded-full px-1">
+                {totalItems > 9 ? "9+" : totalItems}
+              </span>
+            )}
+          </Link>
+        </motion.div>
+
         {/* CTA button */}
         <motion.div
           className="hidden md:flex"
@@ -118,9 +161,22 @@ export default function Navbar() {
           </a>
         </motion.div>
 
-        {/* Hamburger */}
-        <button
-          className="md:hidden flex flex-col gap-1.5 p-2"
+        {/* Mobile: cart + hamburger */}
+        <div className="md:hidden flex items-center gap-1">
+          <Link
+            href="/korpa"
+            className="relative p-2 text-mil-text/70 hover:text-white transition-colors"
+            aria-label="Korpa"
+          >
+            <CartIcon />
+            {mounted && totalItems > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 bg-mil-green-mid text-white text-[9px] font-bold flex items-center justify-center rounded-full px-1">
+                {totalItems > 9 ? "9+" : totalItems}
+              </span>
+            )}
+          </Link>
+          <button
+          className="flex flex-col gap-1.5 p-2"
           onClick={() => setOpen(!open)}
           aria-label="Toggle menu"
         >
@@ -139,7 +195,8 @@ export default function Navbar() {
             transition={{ duration: 0.2 }}
             className="block w-6 h-0.5 bg-mil-text origin-center"
           />
-        </button>
+          </button>
+        </div>
       </nav>
 
       {/* Mobile menu */}

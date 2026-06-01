@@ -20,6 +20,7 @@ export const metadata: Metadata = {
 import { Animate, Stagger, StaggerItem } from "@/components/Animate";
 import { CATEGORIES } from "@/types/database";
 import type { Product } from "@/types/database";
+import AddToCartButton from "@/components/AddToCartButton";
 
 export const dynamic = "force-dynamic";
 
@@ -138,72 +139,81 @@ export default async function ShopPage() {
                     <Stagger className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5" staggerDelay={0.07}>
                       {catProducts.map((product) => (
                         <StaggerItem key={product.id} variant="scaleUp">
-                          <Link
-                            href={`/shop/${product.id}`}
-                            className="bg-mil-card border border-mil-border clip-corner overflow-hidden group hover:border-mil-green-mid transition-all duration-300 glow-on-hover flex flex-col block"
-                          >
-                            {/* Image */}
-                            <div className="relative h-52 bg-mil-surface overflow-hidden">
-                              {product.images?.[0] ? (
-                                <Image
-                                  src={product.images[0]}
-                                  alt={product.name}
-                                  fill
-                                  className="object-cover transition-transform duration-700 group-hover:scale-105"
-                                  sizes="(max-width:640px) 100vw,(max-width:1024px) 50vw,25vw"
-                                />
-                              ) : (
-                                <div className="w-full h-full flex items-center justify-center">
-                                  <span className="text-mil-border/40 text-4xl">⬡</span>
-                                </div>
-                              )}
-                              <div className="absolute inset-0 bg-gradient-to-t from-mil-card/60 to-transparent" />
+                          <div className="bg-mil-card border border-mil-border clip-corner overflow-hidden group hover:border-mil-green-mid transition-all duration-300 glow-on-hover flex flex-col">
+                            {/* Clickable area → product page */}
+                            <Link href={`/shop/${product.id}`} className="flex flex-col flex-1">
+                              {/* Image */}
+                              <div className="relative h-52 bg-mil-surface overflow-hidden">
+                                {product.images?.[0] ? (
+                                  <Image
+                                    src={product.images[0]}
+                                    alt={product.name}
+                                    fill
+                                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                                    sizes="(max-width:640px) 100vw,(max-width:1024px) 50vw,25vw"
+                                  />
+                                ) : (
+                                  <div className="w-full h-full flex items-center justify-center">
+                                    <span className="text-mil-border/40 text-4xl">⬡</span>
+                                  </div>
+                                )}
+                                <div className="absolute inset-0 bg-gradient-to-t from-mil-card/60 to-transparent" />
 
-                              {/* Stock badge */}
-                              <div className="absolute top-3 left-3">
-                                <span className={`text-[9px] px-2 py-1 font-semibold tracking-[0.15em] uppercase ${
-                                  product.in_stock
-                                    ? "bg-mil-green-mid/90 text-white"
-                                    : "bg-mil-dark/80 text-mil-muted border border-mil-border"
-                                }`} style={{ fontFamily: "var(--font-rajdhani)" }}>
-                                  {product.in_stock ? "Na stanju" : "Nema"}
-                                </span>
-                              </div>
-
-                              {/* Multiple images indicator */}
-                              {product.images?.length > 1 && (
-                                <div className="absolute bottom-3 right-3">
-                                  <span className="text-[9px] bg-mil-dark/80 border border-mil-border text-mil-muted px-2 py-0.5 tracking-wider"
-                                    style={{ fontFamily: "var(--font-rajdhani)" }}>
-                                    {product.images.length} slike
+                                {/* Stock badge */}
+                                <div className="absolute top-3 left-3">
+                                  <span className={`text-[9px] px-2 py-1 font-semibold tracking-[0.15em] uppercase ${
+                                    product.in_stock
+                                      ? "bg-mil-green-mid/90 text-white"
+                                      : "bg-mil-dark/80 text-mil-muted border border-mil-border"
+                                  }`} style={{ fontFamily: "var(--font-rajdhani)" }}>
+                                    {product.in_stock ? "Na stanju" : "Nema"}
                                   </span>
                                 </div>
-                              )}
-                            </div>
 
-                            {/* Content */}
-                            <div className="p-5 flex flex-col flex-1">
-                              <h3 className="text-white font-bold text-base mb-1 group-hover:text-mil-green-light transition-colors"
-                                style={{ fontFamily: "var(--font-rajdhani)" }}>
-                                {product.name}
-                              </h3>
-                              {product.description && (
-                                <p className="text-mil-text/50 text-xs leading-relaxed mb-3 line-clamp-2">
-                                  {product.description}
-                                </p>
-                              )}
-                              <div className="mt-auto flex items-center justify-between pt-4 border-t border-mil-border">
-                                <span className="text-xl font-bold text-mil-gold"
-                                  style={{ fontFamily: "var(--font-rajdhani)" }}>
-                                  €{Number(product.price).toFixed(2)}
-                                </span>
-                                <span className="px-4 py-2 bg-mil-green-mid group-hover:bg-mil-green-light text-white text-xs font-semibold tracking-[0.1em] uppercase clip-corner-sm transition-all"
-                                  style={{ fontFamily: "var(--font-rajdhani)" }}>
-                                  Pogledaj →
-                                </span>
+                                {/* Multiple images indicator */}
+                                {product.images?.length > 1 && (
+                                  <div className="absolute bottom-3 right-3">
+                                    <span className="text-[9px] bg-mil-dark/80 border border-mil-border text-mil-muted px-2 py-0.5 tracking-wider"
+                                      style={{ fontFamily: "var(--font-rajdhani)" }}>
+                                      {product.images.length} slike
+                                    </span>
+                                  </div>
+                                )}
                               </div>
+
+                              {/* Content */}
+                              <div className="p-5 flex flex-col flex-1">
+                                <h3 className="text-white font-bold text-base mb-1 group-hover:text-mil-green-light transition-colors"
+                                  style={{ fontFamily: "var(--font-rajdhani)" }}>
+                                  {product.name}
+                                </h3>
+                                {product.description && (
+                                  <p className="text-mil-text/50 text-xs leading-relaxed line-clamp-2">
+                                    {product.description}
+                                  </p>
+                                )}
+                              </div>
+                            </Link>
+
+                            {/* Action row */}
+                            <div className="px-5 pb-5 flex items-center justify-between border-t border-mil-border pt-4">
+                              <span className="text-xl font-bold text-mil-gold"
+                                style={{ fontFamily: "var(--font-rajdhani)" }}>
+                                €{Number(product.price).toFixed(2)}
+                              </span>
+                              {product.in_stock ? (
+                                <AddToCartButton product={product} size="sm" />
+                              ) : (
+                                <Link
+                                  href={`/shop/${product.id}`}
+                                  className="px-4 py-2 border border-mil-border hover:border-mil-gold text-mil-muted hover:text-mil-gold text-xs font-semibold tracking-[0.1em] uppercase clip-corner-sm transition-all"
+                                  style={{ fontFamily: "var(--font-rajdhani)" }}
+                                >
+                                  Pogledaj →
+                                </Link>
+                              )}
                             </div>
-                          </Link>
+                          </div>
                         </StaggerItem>
                       ))}
                     </Stagger>

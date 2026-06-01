@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { CATEGORIES } from "@/types/database";
 import type { Product } from "@/types/database";
 import ProductGallery from "./_components/ProductGallery";
+import AddToCartButton from "@/components/AddToCartButton";
 
 export const dynamic = "force-dynamic";
 
@@ -116,11 +117,12 @@ export default async function ProductPage({
 
               {/* CTA */}
               <div className="space-y-3">
+                <AddToCartButton product={product} size="lg" />
                 <a
                   href="https://www.instagram.com/yarilo_airsoft/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 w-full py-4 bg-mil-green-mid hover:bg-mil-green-light text-white font-bold tracking-[0.2em] uppercase clip-corner transition-all text-sm"
+                  className="flex items-center justify-center gap-2 w-full py-4 border border-mil-border hover:border-mil-gold text-mil-text/60 hover:text-mil-gold font-semibold tracking-[0.15em] uppercase clip-corner transition-all text-sm"
                   style={{ fontFamily: "var(--font-rajdhani)" }}
                 >
                   Kontaktiraj na Instagramu →
